@@ -17,7 +17,7 @@ def do_eval(sess, input_data, eval_correct, input_placeholder, labels_placeholde
   num_examples = steps_per_epoch * FLAGS.batch_size
 	
   for _ in xrange(steps_per_epoch):
-    feed_dict = utils.get_feed_dict(input_data, input_placeholder, labels_placeholder, FLAGS.batch_size, FLAGS.fake_data)
+    feed_dict = utils.get_feed_dict(input_data, input_placeholder, labels_placeholder, FLAGS.fake_data)
     correct += sess.run(eval_correct, feed_dict = feed_dict)
   precision = float(correct) / num_examples
   print('  Num examples: %d  Num correct: %d  Precision @ 1: %0.04f' % (num_examples, correct, precision))
@@ -45,7 +45,7 @@ def do_training():
 
 		for steps in xrange(FLAGS.max_steps):
 			start_time = time.time()
-			feed_dict = utils.get_feed_dict(data_sets.train, input_placeholder, labels_placeholder, FLAGS.batch_size, FLAGS.fake_data)
+			feed_dict = utils.get_feed_dict(data_sets.train, input_placeholder, labels_placeholder, FLAGS.fake_data)
 			_, loss_value = sess.run([train_op, loss], feed_dict=feed_dict)
 			duration = time.time() - start_time
 
