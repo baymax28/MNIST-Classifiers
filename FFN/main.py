@@ -11,14 +11,16 @@ import utils
 import mnistFFN
 
 def do_eval(sess, input_data, eval_correct, input_placeholder, labels_placeholder):
-	steps_per_epoch = input_data.num_examples / FLAGS.batch_size
-	num_examples = steps_per_epoch * FLAGS.batch_size
-
-	for _ in xrange(steps_per_epoch):
-		feed_dict = utils.get_feed_dict(input_data, input_placeholder, labels_placeholder, FLAGS.fake_data)
-		correct += sess.run([eval_correct], feed_dict = feed_dict)
-	precision = correct / num_examples
-	print('  Num examples: %d  Num correct: %d  Precision @ 1: %0.04f' % (num_examples, true_count, precision))
+  steps_per_epoch = input_data.num_examples / FLAGS.batch_size
+  correct = 0
+	
+  num_examples = steps_per_epoch * FLAGS.batch_size
+	
+  for _ in xrange(steps_per_epoch):
+    feed_dict = utils.get_feed_dict(input_data, input_placeholder, labels_placeholder, FLAGS.batch_size, FLAGS.fake_data)
+    correct += sess.run(eval_correct, feed_dict = feed_dict)
+  precision = float(correct) / num_examples
+  print('  Num examples: %d  Num correct: %d  Precision @ 1: %0.04f' % (num_examples, correct, precision))
 
 
 def do_training():
@@ -41,17 +43,17 @@ def do_training():
 
 		sess.run(init)
 
-		for steps in max_steps:
+		for steps in xrange(FLAGS.max_steps):
 			start_time = time.time()
-			feed_dict = utils.get_feed_dict(data_sets.train, input_placeholder, labels_placeholder, FLAGS.fake_data)
-			_, loss = sess.run([train_op, loss], feed_dict=feed_dict)
+			feed_dict = utils.get_feed_dict(data_sets.train, input_placeholder, labels_placeholder, FLAGS.batch_size, FLAGS.fake_data)
+			_, loss_value = sess.run([train_op, loss], feed_dict=feed_dict)
 			duration = time.time() - start_time
 
 			if steps % 100 == 0:
-				print('Step %d: loss = %0.2f (%0.2f)' % (steps, loss, duration))
+				print('Step %d: loss = %0.2f (%0.3f)' % (steps, loss_value, duration))
 
-			if steps % 1000 == 0 or (steps + 1) == max_steps:
-				do_eval(sess, data_sets.trian, eval_correct, input_placeholder, labels_placeholder)
+			if steps % 1000 == 0 or (steps + 1) == FLAGS.max_steps:
+				do_eval(sess, data_sets.train, eval_correct, input_placeholder, labels_placeholder)
 				do_eval(sess, data_sets.validation, eval_correct, input_placeholder, labels_placeholder)
 				do_eval(sess, data_sets.test, eval_correct, input_placeholder, labels_placeholder)
 
@@ -72,10 +74,10 @@ if __name__ == '__main__':
       help='Initial learning rate.'
   )
   parser.add_argument(
-      '--nEpochs',
+      '--max_steps',
       type=int,
       default=2000,
-      help='Number of epochs to run trainer.'
+      help='Number of steps to run trainer.'
   )
   parser.add_argument(
       '--hidden1_nodes',
