@@ -7,8 +7,21 @@ import time
 
 from tensorflow.examples.tutorials.mnist import input_data
 
-import utils
 import mnistFFN
+
+def get_placeholders(batch_size, input_dimensions, output_dimensions):
+  input_placeholder = tf.placeholder(tf.float32, shape=(batch_size, input_dimensions))
+  labels_placeholder = tf.placeholder(tf.int32, shape=(batch_size))
+  return input_placeholder, labels_placeholder
+
+def get_feed_dict(input_data, input_placeholder, labels_placeholder, fake_data=False):
+  batch_size = int(labels_placeholder.shape[0])
+  input_feed, labels_feed = input_data.next_batch(batch_size, fake_data)
+  feed_dict = {
+    input_placeholder : input_feed,
+    labels_placeholder : labels_feed,
+  }
+  return feed_dict
 
 def do_eval(sess, input_data, eval_correct, input_placeholder, labels_placeholder):
   steps_per_epoch = input_data.num_examples / FLAGS.batch_size
@@ -17,7 +30,7 @@ def do_eval(sess, input_data, eval_correct, input_placeholder, labels_placeholde
   num_examples = steps_per_epoch * FLAGS.batch_size
 	
   for _ in xrange(steps_per_epoch):
-    feed_dict = utils.get_feed_dict(input_data, input_placeholder, labels_placeholder, FLAGS.fake_data)
+    feed_dict = get_feed_dict(input_data, input_placeholder, labels_placeholder, FLAGS.fake_data)
     correct += sess.run(eval_correct, feed_dict = feed_dict)
   precision = float(correct) / num_examples
   print('  Num examples: %d  Num correct: %d  Precision @ 1: %0.04f' % (num_examples, correct, precision))
@@ -27,7 +40,7 @@ def do_training():
 	data_sets = input_data.read_data_sets(FLAGS.input_data_dir, FLAGS.fake_data)
 
 	with tf.Graph().as_default():
-		input_placeholder, labels_placeholder = utils.get_placeholders(FLAGS.batch_size, mnistFFN.IMAGE_PIXELS, mnistFFN.NUM_CLASSES)
+		input_placeholder, labels_placeholder = get_placeholders(FLAGS.batch_size, mnistFFN.IMAGE_PIXELS, mnistFFN.NUM_CLASSES)
 
 		logits = mnistFFN.feed_forward_model(input_placeholder, FLAGS.hidden1_nodes, FLAGS.hidden2_nodes)
 
@@ -45,7 +58,7 @@ def do_training():
 
 		for steps in xrange(FLAGS.max_steps):
 			start_time = time.time()
-			feed_dict = utils.get_feed_dict(data_sets.train, input_placeholder, labels_placeholder, FLAGS.fake_data)
+			feed_dict = get_feed_dict(data_sets.train, input_placeholder, labels_placeholder, FLAGS.fake_data)
 			_, loss_value = sess.run([train_op, loss], feed_dict=feed_dict)
 			duration = time.time() - start_time
 
