@@ -60,23 +60,12 @@ def do_training():
 
 		saver = tf.train.Saver();
 
-		sess.run(init)
+		saver.restore(sess, tf.train.latest_checkpoint('../models'))
 
+		print("Model restores from " + tf.train.latest_checkpoint('../models'))
 		for step in xrange(FLAGS.max_steps):
-			start_time = time.time()
-			feed_dict = get_feed_dict(data_sets.train, input_placeholder, labels_placeholder, FLAGS.fake_data)
-			_, loss_value = sess.run([train_op, loss], feed_dict=feed_dict)
-			duration = time.time() - start_time
 
-			if step % 100 == 0:
-				print('Step %d: loss = %0.2f (%0.3f)' % (step, loss_value, duration))
-				summary_str = sess.run(summary_all, feed_dict=feed_dict)
-				summary_writer.add_summary(summary_str, step)
-				summary_writer.flush()
-
-			if (step + 1) % 1000 == 0 or (step + 1) == FLAGS.max_steps:
-				saver.save(sess, "../models/mnistFFN-ckpt", global_step=step)
-				print 'Model saved.'
+			if step % 1000 == 0 or (step + 1) == FLAGS.max_steps:
 				do_eval(sess, data_sets.train, eval_correct, input_placeholder, labels_placeholder)
 				do_eval(sess, data_sets.validation, eval_correct, input_placeholder, labels_placeholder)
 				do_eval(sess, data_sets.test, eval_correct, input_placeholder, labels_placeholder)
