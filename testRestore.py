@@ -63,6 +63,7 @@ def do_training():
 		saver.restore(sess, tf.train.latest_checkpoint('../models'))
 
 		print("Model restores from " + tf.train.latest_checkpoint('../models'))
+		
 		for step in xrange(FLAGS.max_steps):
 
 			if step % 1000 == 0 or (step + 1) == FLAGS.max_steps:
