@@ -42,7 +42,9 @@ def do_training():
 	with tf.Graph().as_default():
 		input_placeholder, labels_placeholder = get_placeholders(FLAGS.batch_size, mnistFFN.IMAGE_PIXELS, mnistFFN.NUM_CLASSES)
 
-		logits = mnistFFN.feed_forward_model(input_placeholder, FLAGS.hidden1_nodes, FLAGS.hidden2_nodes)
+		# logits = mnistFFN.feed_forward_model(input_placeholder, FLAGS.hidden1_nodes, FLAGS.hidden2_nodes)
+
+		logits = mnistFFN.feed_forward_model_single_layer(input_placeholder, FLAGS.hidden1_nodes, FLAGS.hidden2_nodes)
 
 		loss = mnistFFN.loss(logits, labels_placeholder)
 
@@ -130,7 +132,7 @@ if __name__ == '__main__':
 	parser.add_argument(
 			'--log_dir',
 			type=str,
-			default='./log_data',
+			default='./log_data_tmp',
 			help='Directory to put the log data.'
 	)
 	parser.add_argument(
