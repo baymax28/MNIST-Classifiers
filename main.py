@@ -10,8 +10,8 @@ from tensorflow.examples.tutorials.mnist import input_data
 import mnistFFN
 
 def get_placeholders(batch_size, input_dimensions, output_dimensions):
-	input_placeholder = tf.placeholder(tf.float32, shape=(batch_size, input_dimensions))
-	labels_placeholder = tf.placeholder(tf.int32, shape=(batch_size))
+	input_placeholder = tf.placeholder(tf.float32, shape=(batch_size, input_dimensions), name='inputs')
+	labels_placeholder = tf.placeholder(tf.int32, shape=(batch_size), name='labels')
 	return input_placeholder, labels_placeholder
 
 def get_feed_dict(input_data, input_placeholder, labels_placeholder, fake_data=False):

@@ -8,14 +8,20 @@ IMAGE_PIXELS = IMAGE_SIZE * IMAGE_SIZE
 def feed_forward_model(images, hidden1_nodes, hidden2_nodes):
 	
 	with tf.name_scope('Hidden1'):
-		weights = tf.Variable(tf.random_normal([IMAGE_PIXELS, hidden1_nodes]), name='weights')
+		weights = tf.Variable(tf.random_normal([IMAGE_PIXELS, hidden1_nodes])/tf.sqrt(float(IMAGE_PIXELS)/2), name='weights')
 		biases = tf.Variable(tf.random_normal([hidden1_nodes]), name='biases')
-		hidden1 = tf.nn.relu(tf.add(tf.matmul(images, weights), biases))
+		# hidden1 = tf.nn.relu(tf.add(tf.matmul(images, weights), biases))
+		hidden1 = tf.nn.sigmoid(tf.add(tf.matmul(images, weights), biases))
+		# hidden1 = tf.nn.tanh(tf.add(tf.matmul(images, weights), biases))
+		tf.summary.histogram('FirstLayerActivation', hidden1)
 
 	with tf.name_scope('Hidden2'):
-		weights = tf.Variable(tf.random_normal([hidden1_nodes, hidden2_nodes]), name='weights')
+		weights = tf.Variable(tf.random_normal([hidden1_nodes, hidden2_nodes])/tf.sqrt(float(hidden1_nodes)/2), name='weights')
 		biases = tf.Variable(tf.random_normal([hidden2_nodes]), name='biases')
-		hidden2 = tf.nn.relu(tf.add(tf.matmul(hidden1, weights), biases))
+		# hidden2 = tf.nn.relu(tf.add(tf.matmul(hidden1, weights), biases))
+		hidden2 = tf.nn.sigmoid(tf.add(tf.matmul(hidden1, weights), biases))
+		# hidden2 = tf.nn.tanh(tf.add(tf.matmul(hidden1, weights), biases))
+		tf.summary.histogram('SecondLayerActivation', hidden2)
 
 	with tf.name_scope('Logits'):
 		weights = tf.Variable(tf.random_normal([hidden2_nodes, NUM_CLASSES]), name='weights')
@@ -32,6 +38,7 @@ def loss(logits, labels):
 def training(loss, learning_rate):
 	tf.summary.scalar('Loss', loss)
 	optimizer = tf.train.GradientDescentOptimizer(learning_rate)
+	# optimizer = tf.train.AdamOptimizer(learning_rate)
 	global_step = tf.Variable(0, name='global_step', trainable='false')
 	train_op = optimizer.minimize(loss, global_step=global_step)
 	return train_op
