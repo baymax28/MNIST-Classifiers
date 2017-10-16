@@ -7,7 +7,6 @@ MNIST-Classifiers
 
 Tasks
 ------------------
-- [] Change the initializations to observe improved results.
-- [] Document the differences observed with different initaializations.
+- Implement simple CNN on MNIST
 
 [Dataset](http://yann.lecun.com/exdb/mnist/)

@@ -8,6 +8,7 @@ import time
 from tensorflow.examples.tutorials.mnist import input_data
 
 import mnistFFN
+import mnistCNN
 
 def get_placeholders(batch_size, input_dimensions, output_dimensions):
 	input_placeholder = tf.placeholder(tf.float32, shape=(batch_size, input_dimensions), name='inputs')
@@ -35,22 +36,35 @@ def do_eval(sess, input_data, eval_correct, input_placeholder, labels_placeholde
 	precision = float(correct) / num_examples
 	print('  Num examples: %d  Num correct: %d  Precision @ 1: %0.04f' % (num_examples, correct, precision))
 
-
 def do_training():
 	data_sets = input_data.read_data_sets(FLAGS.input_data_dir, FLAGS.fake_data)
 
 	with tf.Graph().as_default():
 		input_placeholder, labels_placeholder = get_placeholders(FLAGS.batch_size, mnistFFN.IMAGE_PIXELS, mnistFFN.NUM_CLASSES)
 
+		#-----------------------------------------------------------------------#
+
 		# logits = mnistFFN.feed_forward_model(input_placeholder, FLAGS.hidden1_nodes, FLAGS.hidden2_nodes)
 
-		logits = mnistFFN.feed_forward_model_single_layer(input_placeholder, FLAGS.hidden1_nodes, FLAGS.hidden2_nodes)
+		# logits = mnistFFN.feed_forward_model_single_layer(input_placeholder, FLAGS.hidden1_nodes, FLAGS.hidden2_nodes)
 
-		loss = mnistFFN.loss(logits, labels_placeholder)
+		# loss = mnistFFN.loss(logits, labels_placeholder)
 
-		train_op = mnistFFN.training(loss, FLAGS.learning_rate)
+		# train_op = mnistFFN.training(loss, FLAGS.learning_rate)
 
-		eval_correct = mnistFFN.evaluation(logits, labels_placeholder)
+		# eval_correct = mnistFFN.evaluation(logits, labels_placeholder)
+
+		#-----------------------------------------------------------------------#
+
+		logits = mnistCNN.convolutional_model(input_placeholder, 5, 5, 32, 64, 1024)
+
+		loss = mnistCNN.loss(logits, labels_placeholder)
+
+		train_op = mnistCNN.training(loss, FLAGS.learning_rate)
+
+		eval_correct = mnistCNN.evaluation(logits, labels_placeholder)
+
+		#-----------------------------------------------------------------------#
 
 		init = tf.global_variables_initializer()
 
@@ -76,8 +90,8 @@ def do_training():
 				summary_writer.add_summary(summary_str, step)
 				summary_writer.flush()
 
-			if (step + 1) % 1000 == 0 or (step + 1) == FLAGS.max_steps:
-				saver.save(sess, "../models/mnistFFN-ckpt", global_step=step)
+			if (step + 1) % 5000 == 0 or (step + 1) == FLAGS.max_steps:
+				saver.save(sess, "../models/mnistCNN-ckpt", global_step=step)
 				print 'Model saved.'
 				do_eval(sess, data_sets.train, eval_correct, input_placeholder, labels_placeholder)
 				do_eval(sess, data_sets.validation, eval_correct, input_placeholder, labels_placeholder)

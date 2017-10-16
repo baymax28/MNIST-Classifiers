@@ -38,11 +38,14 @@ def feed_forward_model_single_layer(images, hidden1_nodes, hidden2_nodes):
 
 	with tf.name_scope('Logits'):
 		# weights = tf.Variable(tf.random_normal([IMAGE_PIXELS, NUM_CLASSES]), name='weights')
-		weights = tf.Variable(tf.random_normal([IMAGE_PIXELS, NUM_CLASSES])/tf.sqrt(float(IMAGE_PIXELS)/2), name='weights')
-		templates = tf.reshape(tf.transpose(weights), [NUM_CLASSES, IMAGE_SIZE, IMAGE_SIZE, 1])
+		# weights = tf.Variable(tf.random_normal([IMAGE_PIXELS, NUM_CLASSES])/tf.sqrt(float(IMAGE_PIXELS)/2), name='weights')
+		weights = tf.Variable(tf.zeros([IMAGE_PIXELS, NUM_CLASSES]))
+  		templates = tf.reshape(tf.transpose(weights), [NUM_CLASSES, IMAGE_SIZE, IMAGE_SIZE, 1])
 		tf.summary.image('Trained templates', templates, max_outputs=NUM_CLASSES)
-		biases = tf.Variable(tf.random_normal([NUM_CLASSES]), name='biases')
-		logits = tf.nn.relu(tf.add(tf.matmul(images, weights), biases))
+		# biases = tf.Variable(tf.random_normal([NUM_CLASSES]), name='biases')
+		biases = tf.Variable(tf.zeros([NUM_CLASSES]))
+		# logits = tf.nn.relu(tf.add(tf.matmul(images, weights), biases))
+		logits = tf.add(tf.matmul(images, weights), biases)
 
 	return logits
 
